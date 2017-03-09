@@ -1,0 +1,1 @@
+Simple hourly fee counter written on Python.
