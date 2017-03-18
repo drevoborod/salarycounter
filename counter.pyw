@@ -38,8 +38,16 @@ class Main(tk.Tk):
         except tk.TclError:
             pass
         else:
-            if re.compile("^[0-9]{1,6}:[0-5][0-9]$").match(self.quantity.get()):
-                res = calculate(self.hourly_cost.get(), self.quantity.get())
+            hours = self.quantity.get()
+            if re.compile("^[0-9]{1,6}:[0-5][0-9]$").match(hours):
+                res = True
+            elif re.compile("^[0-9]{1,6}$").match(hours):
+                hours += ":00"
+                res = True
+            else:
+                res = False
+            if res:
+                res = calculate(self.hourly_cost.get(), hours)
                 self.total_hours.set(res[0])
                 self.total_price.set(res[1])
 
