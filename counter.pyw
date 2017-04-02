@@ -16,8 +16,9 @@ class Main(tk.Tk):
         tk.Label(mainframe, text="Enter price of one hour:").grid(row=0, column=1)
         self.quantity = tk.Entry(mainframe, width=10)
         self.quantity.grid(row=1, column=0, pady=5)
-        self.hourly_cost = tk.DoubleVar(mainframe)
-        tk.Entry(mainframe, width=10, textvariable=self.hourly_cost).grid(row=1, column=1)
+        self.hourly_cost = tk.DoubleVar(mainframe, value=DEFAULT_PRICE)
+        hourly_cost_entry = tk.Entry(mainframe, width=10, textvariable=self.hourly_cost)
+        hourly_cost_entry.grid(row=1, column=1)
         tk.Frame(mainframe, height=5).grid(row=2)
         tk.Label(mainframe, text="Total hours in decimal:").grid(row=3, column=0)
         tk.Label(mainframe, text="Total price:").grid(row=3, column=1)
@@ -29,27 +30,34 @@ class Main(tk.Tk):
         tk.Button(self, text="Calculate", command=self.calculate).grid(row=3, pady=10)
         self.bind("<Return>", lambda e: self.calculate())
         self.bind("<Escape>", lambda e: self.quit())
+        self.bind("<Control-c>", lambda e: self.copy())
+        hourly_cost_entry.bind("<FocusIn>", lambda e: hourly_cost_entry.delete(0, "end"))
+        #self.quantity.bind("<Button-1>", lambda e: hourly_cost_entry.delete(0, "end"))
         self.quantity.focus()
         self.mainloop()
 
     def calculate(self):
         try:
-            self.quantity.get()
+            hours = self.quantity.get()
+            cost = self.hourly_cost.get()
         except tk.TclError:
             pass
         else:
-            hours = self.quantity.get()
             if re.compile("^[0-9]{1,6}:[0-5][0-9]$").match(hours):
-                res = True
+                match = True
             elif re.compile("^[0-9]{1,6}$").match(hours):
                 hours += ":00"
-                res = True
+                match = True
             else:
-                res = False
-            if res:
-                res = calculate(self.hourly_cost.get(), hours)
+                match = False
+            if match:
+                res = calculate(cost, hours)
                 self.total_hours.set(res[0])
                 self.total_price.set(res[1])
+
+    def copy(self):
+        self.clipboard_clear()
+        self.clipboard_append(self.total_price.get())
 
 
 def calculate(hour_price, total_hours):
@@ -62,5 +70,6 @@ def calculate(hour_price, total_hours):
     return time_decimal_rounded, "{:.2f}".format(total)
 
 
+DEFAULT_PRICE = 0.0
 if __name__ == "__main__":
     Main()
