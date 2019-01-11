@@ -1,1 +1,1 @@
-Simple hourly fee counter written on Python.
+Simple hourly fee counter written in Python.
